@@ -33,14 +33,14 @@ This document outlines the typical workflow for contributing to the Career Intel
 
 ## Agents workflow
 
-- AGENTS.md
+- `AGENTS.md`
   Repository-wide engineering instructions
 
-- issue-tracker.md
+- `issue-tracker.md`
   Where work lives and how to manage it
 
-- domain.md
+- `domain.md`
   How agents find domain knowledge
 
-- CONTEXT.md + Architecture Decision Records
+- `CONTEXT.md` + Architecture Decision Records
   Product rules, terminology and technical decisions
