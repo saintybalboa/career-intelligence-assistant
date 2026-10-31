@@ -7,8 +7,10 @@ export function App() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <Header />
-      <DocumentsSection />
-      <AssistantSection />
+      <main className="flex flex-1 flex-col">
+        <DocumentsSection />
+        <AssistantSection />
+      </main>
     </div>
   );
 }
