@@ -1,6 +1,6 @@
 # ADR-001: Monorepo Architecture
 
-- Status: Accepted
+- Status: Proposed
 - Date: 2026-10-30
 
 ## Context
