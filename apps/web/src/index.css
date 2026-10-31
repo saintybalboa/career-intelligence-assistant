@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-white text-secondary-600;
+  }
+
+  h1 {
+    @apply text-2xl font-bold text-secondary-900;
+  }
+
+  h2 {
+    @apply text-xl font-bold text-secondary-900;
+  }
+
+  button:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-600;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-600;
+  }
+}
