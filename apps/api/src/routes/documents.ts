@@ -84,7 +84,10 @@ export async function registerDocumentRoutes(
           mimeType,
         });
 
-        request.log.info({ documentId: document.id, fileName: data.filename }, 'Document uploaded successfully');
+        request.log.info(
+          { documentId: document.id, fileName: data.filename },
+          'Document uploaded successfully'
+        );
 
         return reply.status(201).send({
           id: document.id,
@@ -219,4 +222,3 @@ export async function registerDocumentRoutes(
     }
   );
 }
-

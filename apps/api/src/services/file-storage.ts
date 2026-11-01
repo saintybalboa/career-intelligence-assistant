@@ -37,7 +37,11 @@ export class LocalFileStorageService implements FileStorageService {
     }
   }
 
-  async storeFile(fileBuffer: Buffer, originalFileName: string, _mimeType: string): Promise<StoredFile> {
+  async storeFile(
+    fileBuffer: Buffer,
+    originalFileName: string,
+    _mimeType: string
+  ): Promise<StoredFile> {
     if (fileBuffer.length > this.maxSizeBytes) {
       throw new Error(`File exceeds maximum size of ${this.maxSizeBytes} bytes`);
     }

@@ -106,9 +106,7 @@
         "migrations_name_unique": {
           "name": "migrations_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},

@@ -70,7 +70,10 @@ export class PostgresDocumentRepository implements DocumentRepository {
     return result.rows.map((row) => this.mapRow(row));
   }
 
-  async update(id: string, data: Partial<{ processingState: ProcessingState }>): Promise<Document | null> {
+  async update(
+    id: string,
+    data: Partial<{ processingState: ProcessingState }>
+  ): Promise<Document | null> {
     const updates: string[] = [];
     const values: unknown[] = [];
     let paramCount = 1;

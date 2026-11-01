@@ -68,9 +68,9 @@ describe('LocalFileStorageService', () => {
 
   it('rejects files exceeding maximum size', async () => {
     const oversizedBuffer = Buffer.alloc(11 * 1024 * 1024);
-    await expect(service.storeFile(oversizedBuffer, 'large.pdf', 'application/pdf')).rejects.toThrow(
-      /exceeds maximum size/
-    );
+    await expect(
+      service.storeFile(oversizedBuffer, 'large.pdf', 'application/pdf')
+    ).rejects.toThrow(/exceeds maximum size/);
   });
 
   it('retrieves a stored file by ID', async () => {
@@ -103,7 +103,11 @@ describe('LocalFileStorageService', () => {
 
   it('preserves file extension from original filename', async () => {
     const docxBuffer = Buffer.from('docx content');
-    const stored = await service.storeFile(docxBuffer, 'document.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    const stored = await service.storeFile(
+      docxBuffer,
+      'document.docx',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    );
 
     expect(stored.path).toMatch(/\.docx$/);
 

@@ -24,4 +24,9 @@ export const UploadDocumentRequestSchema = z.object({
 
 export type UploadDocumentRequest = z.infer<typeof UploadDocumentRequestSchema>;
 
-export const AllowedMimeTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+export const AllowedMimeTypes = [
+  'application/pdf',
+  'text/plain',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
