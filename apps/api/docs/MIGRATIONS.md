@@ -54,7 +54,7 @@ $$ LANGUAGE SQL;
   "idx": 2,
   "version": "7",
   "digest": "...",
-  "when": 1730470287000,
+  "when": 1730470287001,
   "tag": "0002_add_custom_function",
   "loc": {
     "directory": "src/db/migrations",
