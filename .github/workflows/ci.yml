@@ -18,16 +18,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@eacb9d6e4ff8f4a8d04fcf9017a3f0632ba61139
+        uses: actions/checkout@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@1a4442caab8f68f7a7afbc040d11da5704efdc0e1
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           check-latest: false
 
       - name: Install pnpm
-        uses: pnpm/action-setup@7d7125efee96d17aeda2d9b29faf7071749b2b3d
+        uses: pnpm/action-setup@v2
         with:
           version: 12.16.1
 
@@ -38,7 +38,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@1bd1e32a3bdc2fb8063304476db3b0d57ce21bcc
+        uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
