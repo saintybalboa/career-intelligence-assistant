@@ -18,7 +18,7 @@ import { closeDatabase, getDatabase } from '../src/db/index.js';
 describe('Database readiness endpoint (/ready)', () => {
   let testPool: Pool;
   const dbConfig = loadDatabaseConfig({
-    DATABASE_URL: 'postgresql://career:career_password@127.0.0.1:5432/career_ai',
+    ...process.env,
     DATABASE_POOL_SIZE: '5',
   });
 
