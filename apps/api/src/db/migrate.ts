@@ -1,4 +1,4 @@
-import { migrate } from 'drizzle-orm/pg-core/migration';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { loadDatabaseConfig } from '../config/database.js';
