@@ -22,21 +22,15 @@ export function DocumentsSection() {
             No documents uploaded yet
           </p>
           <p className="mt-2 text-center text-sm text-secondary-600">
-            Upload your CV and job descriptions to get started. The assistant
-            will use these documents to provide contextual answers about your
-            career alignment.
+            Upload your CV and job descriptions to get started. The assistant will use these
+            documents to provide contextual answers about your career alignment.
           </p>
           <button
             disabled
             className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
             title="Document upload coming soon"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

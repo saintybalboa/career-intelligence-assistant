@@ -14,7 +14,7 @@ describe('App smoke test', () => {
 
   it('should render the documents section', () => {
     render(<App />);
-    const docsHeading = screen.getByRole('heading', { 
+    const docsHeading = screen.getByRole('heading', {
       name: /^documents$/i,
       level: 2,
     });

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Lint, Type Check, Test, Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@eacb9d6e4ff8f4a8d04fcf9017a3f0632ba61139
+
+      - name: Install Node.js
+        uses: actions/setup-node@1a4442caab8f68f7a7afbc040d11da5704efdc0e1
+        with:
+          node-version: 22
+          check-latest: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@7d7125efee96d17aeda2d9b29faf7071749b2b3d
+        with:
+          version: 12.16.1
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@1bd1e32a3bdc2fb8063304476db3b0d57ce21bcc
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Run linter
+        run: pnpm lint
+
+      - name: Type checking
+        run: pnpm typecheck
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build all applications
+        run: pnpm build
