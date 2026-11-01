@@ -29,7 +29,7 @@ describe('Document API endpoints', () => {
       } finally {
         client.release();
       }
-    } catch (error) {
+    } catch (_error) {
       console.log('Database not available for integration tests');
     }
   });

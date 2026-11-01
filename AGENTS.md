@@ -216,11 +216,11 @@ During implementation:
 
 After implementation:
 
-1. Run relevant validation commands.
+1. Run relevant validation commands: **linting, type checking, tests, and builds**.
 2. Review changes against acceptance criteria.
 3. Identify regressions, risks and incomplete work.
 4. Summarise technical decisions and trade-offs.
-5. Report actual validation results.
+5. Report actual validation results (linting, build, test output).
 6. Leave issue closure and delivery decisions to the developer unless explicitly instructed otherwise.
 
 ## Agent skills

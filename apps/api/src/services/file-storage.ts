@@ -33,7 +33,7 @@ export class LocalFileStorageService implements FileStorageService {
     try {
       await fs.mkdir(this.basePath, { recursive: true });
     } catch (error) {
-      throw new Error(`Failed to create storage directory: ${String(error)}`);
+      throw new Error(`Failed to create storage directory: ${String(error)}`, { cause: error });
     }
   }
 
@@ -55,7 +55,7 @@ export class LocalFileStorageService implements FileStorageService {
         sizeBytes: fileBuffer.length,
       };
     } catch (error) {
-      throw new Error(`Failed to store file: ${String(error)}`);
+      throw new Error(`Failed to store file: ${String(error)}`, { cause: error });
     }
   }
 
@@ -72,7 +72,7 @@ export class LocalFileStorageService implements FileStorageService {
       const filePath = path.join(this.basePath, matchingFile);
       return await fs.readFile(filePath);
     } catch (error) {
-      throw new Error(`Failed to read file: ${String(error)}`);
+      throw new Error(`Failed to read file: ${String(error)}`, { cause: error });
     }
   }
 
@@ -89,7 +89,7 @@ export class LocalFileStorageService implements FileStorageService {
       const filePath = path.join(this.basePath, matchingFile);
       await fs.unlink(filePath);
     } catch (error) {
-      throw new Error(`Failed to delete file: ${String(error)}`);
+      throw new Error(`Failed to delete file: ${String(error)}`, { cause: error });
     }
   }
 }
