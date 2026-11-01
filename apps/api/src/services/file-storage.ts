@@ -52,7 +52,7 @@ export class LocalFileStorageService implements FileStorageService {
     const filePath = path.join(this.basePath, filename);
 
     try {
-      await fs.writeFile(filePath, fileBuffer, { flag: 'wx' });
+      await fs.writeFile(filePath, fileBuffer, { flag: 'wx', mode: 0o600 });
       return {
         id: fileId,
         path: filename,
