@@ -1,8 +1,9 @@
 import { eq, desc } from 'drizzle-orm';
-import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
+import type { Pool } from 'pg';
+import type { Document } from '../domain/document.js';
+import { DocumentType, ProcessingState } from '../domain/document.js';
 import { documentsTable } from '../db/schema.js';
-import { Document, DocumentType, ProcessingState } from '../domain/document.js';
 
 export interface DocumentRepository {
   create(data: {
