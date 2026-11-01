@@ -9,7 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const testStoragePath = path.join(__dirname, '.test-storage');
+const testStoragePath = path.join(__dirname, '.test-document-route-storage');
 
 describe('Document API endpoints', () => {
   let testPool: Pool;
