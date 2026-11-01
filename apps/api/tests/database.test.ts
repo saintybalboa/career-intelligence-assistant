@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeAll, afterAll, test } from 'vitest';
+import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { Pool } from 'pg';
 import { createApp } from '../src/app.js';
 import { loadConfig } from '../src/config/env.js';
@@ -22,8 +22,6 @@ describe('Database readiness endpoint (/ready)', () => {
     DATABASE_POOL_SIZE: '5',
   });
 
-  let databaseAvailable = false;
-
   beforeAll(async () => {
     // Create a test pool to manage the database
     testPool = new Pool({ connectionString: dbConfig.url });
@@ -33,16 +31,16 @@ describe('Database readiness endpoint (/ready)', () => {
       const testClient = await testPool.connect();
       try {
         await testClient.query('SELECT 1');
-        databaseAvailable = true;
 
         // Ensure pgvector extension exists
         await testClient.query('CREATE EXTENSION IF NOT EXISTS vector;');
       } finally {
         testClient.release();
       }
-    } catch (error) {
-      databaseAvailable = false;
-      console.log('Database not available for integration tests. Tests requiring database will be skipped.');
+    } catch (_error) {
+      console.log(
+        'Database not available for integration tests. Tests requiring database will be skipped.'
+      );
     }
   });
 
@@ -50,127 +48,115 @@ describe('Database readiness endpoint (/ready)', () => {
     await testPool.end();
   });
 
-  it(
-    'returns 200 with pgvector version when database is available and healthy',
-    async () => {
-      const app = createApp({
-        config: loadConfig({
-          NODE_ENV: 'test',
-          HOST: '127.0.0.1',
-          PORT: '3002',
-          CORS_ORIGIN: 'http://localhost:5173',
-          LOG_LEVEL: 'silent',
-        }),
-        databaseConfig: dbConfig,
+  it('returns 200 with pgvector version when database is available and healthy', async () => {
+    const app = createApp({
+      config: loadConfig({
+        NODE_ENV: 'test',
+        HOST: '127.0.0.1',
+        PORT: '3002',
+        CORS_ORIGIN: 'http://localhost:5173',
+        LOG_LEVEL: 'silent',
+      }),
+      databaseConfig: dbConfig,
+    });
+
+    try {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/ready',
       });
 
-      try {
-        const response = await app.inject({
-          method: 'GET',
-          url: '/ready',
-        });
-
-        expect(response.statusCode).toBe(200);
-        const body = response.json();
-        expect(body).toHaveProperty('status', 'ready');
-        expect(body).toHaveProperty('pgvector_version');
-        expect(typeof body.pgvector_version).toBe('string');
-      } finally {
-        await app.close();
-        await closeDatabase();
-      }
+      expect(response.statusCode).toBe(200);
+      const body = response.json();
+      expect(body).toHaveProperty('status', 'ready');
+      expect(body).toHaveProperty('pgvector_version');
+      expect(typeof body.pgvector_version).toBe('string');
+    } finally {
+      await app.close();
+      await closeDatabase();
     }
-  );
+  });
 
-  it(
-    'returns 503 when database connection cannot be established',
-    async () => {
-      const app = createApp({
-        config: loadConfig({
-          NODE_ENV: 'test',
-          HOST: '127.0.0.1',
-          PORT: '3002',
-          CORS_ORIGIN: 'http://localhost:5173',
-          LOG_LEVEL: 'silent',
-        }),
-        databaseConfig: {
-          url: 'postgresql://career:career_password@127.0.0.1:5432/nonexistent',
-          poolSize: 5,
-        },
+  it('returns 503 when database connection cannot be established', async () => {
+    const app = createApp({
+      config: loadConfig({
+        NODE_ENV: 'test',
+        HOST: '127.0.0.1',
+        PORT: '3002',
+        CORS_ORIGIN: 'http://localhost:5173',
+        LOG_LEVEL: 'silent',
+      }),
+      databaseConfig: {
+        url: 'postgresql://career:career_password@127.0.0.1:5432/nonexistent',
+        poolSize: 5,
+      },
+    });
+
+    try {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/ready',
       });
 
-      try {
-        const response = await app.inject({
-          method: 'GET',
-          url: '/ready',
-        });
-
-        expect(response.statusCode).toBe(503);
-        const body = response.json();
-        expect(body).toHaveProperty('status', 'unavailable');
-        expect(body).toHaveProperty('reason');
-      } finally {
-        await app.close();
-        await closeDatabase();
-      }
+      expect(response.statusCode).toBe(503);
+      const body = response.json();
+      expect(body).toHaveProperty('status', 'unavailable');
+      expect(body).toHaveProperty('reason');
+    } finally {
+      await app.close();
+      await closeDatabase();
     }
-  );
+  });
 
-  it(
-    'health endpoint remains functional independent of database availability',
-    async () => {
-      const app = createApp({
-        config: loadConfig({
-          NODE_ENV: 'test',
-          HOST: '127.0.0.1',
-          PORT: '3003',
-          CORS_ORIGIN: 'http://localhost:5173',
-          LOG_LEVEL: 'silent',
-        }),
-        databaseConfig: dbConfig,
+  it('health endpoint remains functional independent of database availability', async () => {
+    const app = createApp({
+      config: loadConfig({
+        NODE_ENV: 'test',
+        HOST: '127.0.0.1',
+        PORT: '3003',
+        CORS_ORIGIN: 'http://localhost:5173',
+        LOG_LEVEL: 'silent',
+      }),
+      databaseConfig: dbConfig,
+    });
+
+    try {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/health',
       });
 
-      try {
-        const response = await app.inject({
-          method: 'GET',
-          url: '/health',
-        });
-
-        expect(response.statusCode).toBe(200);
-        expect(response.json()).toEqual({ status: 'ok' });
-      } finally {
-        await app.close();
-        await closeDatabase();
-      }
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({ status: 'ok' });
+    } finally {
+      await app.close();
+      await closeDatabase();
     }
-  );
+  });
 
-  it(
-    'closes database connections gracefully on app shutdown',
-    async () => {
-      const app = createApp({
-        config: loadConfig({
-          NODE_ENV: 'test',
-          HOST: '127.0.0.1',
-          PORT: '3004',
-          CORS_ORIGIN: 'http://localhost:5173',
-          LOG_LEVEL: 'silent',
-        }),
-        databaseConfig: dbConfig,
-      });
+  it('closes database connections gracefully on app shutdown', async () => {
+    const app = createApp({
+      config: loadConfig({
+        NODE_ENV: 'test',
+        HOST: '127.0.0.1',
+        PORT: '3004',
+        CORS_ORIGIN: 'http://localhost:5173',
+        LOG_LEVEL: 'silent',
+      }),
+      databaseConfig: dbConfig,
+    });
 
-      try {
-        // Verify connection works
-        const db = getDatabase();
-        expect(db).not.toBeNull();
-        const isConnected = await db!.isConnected();
-        expect(isConnected).toBe(true);
-      } finally {
-        await app.close();
-        await closeDatabase();
-      }
+    try {
+      // Verify connection works
+      const db = getDatabase();
+      expect(db).not.toBeNull();
+      const isConnected = await db!.isConnected();
+      expect(isConnected).toBe(true);
+    } finally {
+      await app.close();
+      await closeDatabase();
     }
-  );
+  });
 });
 
 describe('Database configuration', () => {

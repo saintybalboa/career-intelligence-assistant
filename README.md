@@ -24,6 +24,7 @@ pnpm -r list --depth -1
 ```
 
 The workspace contains:
+
 - `apps/web`: React frontend application using TypeScript and Vite
 - `apps/api`: Fastify backend API with PostgreSQL and pgvector integration
 - `packages/contracts`: Shared API contracts and schemas
@@ -42,6 +43,7 @@ pnpm db:up
 
 This starts a PostgreSQL 17 container with pgvector extension enabled.
 The database service:
+
 - Runs on `postgresql://career:career_password@127.0.0.1:5432/career_ai`
 - Includes health checks that verify readiness every 10 seconds
 - Persists data in a Docker volume between restarts
@@ -74,28 +76,150 @@ To stop the database without deleting data:
 pnpm db:down
 ```
 
-## Frontend development
+## Development
 
-The frontend is a React application built with TypeScript, Vite, Tailwind CSS, and configured for testing with Vitest and React Testing Library.
+The project uses shared development tooling to ensure consistent code quality across frontend and backend applications. All quality checks run locally before commit and in CI on every pull request.
 
-### Commands
+### Quality gates
 
-Start the development server (runs on `http://localhost:5173`):
+Check all code quality gates before committing:
 
 ```bash
-pnpm --filter @career/web dev
+pnpm check
 ```
 
-Run tests in watch mode:
+This runs formatting, linting and type checking in one command. The individual commands are:
+
+#### Formatting
+
+Format code consistently using Prettier:
 
 ```bash
-pnpm --filter @career/web test
+pnpm format          # Apply formatting to all files
+pnpm format:check    # Check if files need formatting (non-destructive)
 ```
 
-Run tests once (CI mode):
+Configuration is in `.prettierrc.json` and applies to TypeScript, JavaScript, JSON, Markdown and configuration files.
+
+#### Linting
+
+Check code style with ESLint:
 
 ```bash
-pnpm --filter @career/web test -- --run
+pnpm lint            # Show linting errors
+pnpm lint:fix        # Fix auto-fixable issues
+```
+
+ESLint enforces:
+
+- React and React Hooks best practices (frontend)
+- TypeScript type safety
+- Consistent code style
+- Best practices for Node.js (backend)
+
+Configuration is in `eslint.config.js` (shared root configuration).
+
+#### Type Checking
+
+Run TypeScript type checking across all workspaces:
+
+```bash
+pnpm typecheck
+```
+
+This runs type checking on frontend and backend separately. TypeScript strict mode is enabled in both.
+
+### Testing
+
+Run tests for all workspaces:
+
+```bash
+pnpm test
+```
+
+Individual workspaces:
+
+```bash
+pnpm --filter @career/web test -- --run         # Frontend tests (once)
+pnpm --filter @career/api test                  # Backend tests
+```
+
+#### Database-dependent tests
+
+Backend integration tests in `apps/api/tests/database.test.ts` require a running PostgreSQL database with pgvector. These tests are excluded from the default test run (both locally and in CI) to keep the main test suite deterministic and fast.
+
+To run database integration tests locally:
+
+1. **Setup database:**
+
+   ```bash
+   pnpm db:up
+   pnpm db:migrate
+   ```
+
+2. **Run database tests explicitly:**
+
+   ```bash
+   INCLUDE_DB_TESTS=true pnpm --filter @career/api test
+   ```
+
+3. **Clean up:**
+
+   ```bash
+   pnpm db:down        # Stop database
+   pnpm db:reset       # Stop and delete database data
+   ```
+
+In CI, the main `pnpm test` command excludes database tests via the vitest configuration. Database tests can be run in a separate optional job later if needed.
+
+### Building
+
+Build all applications for production:
+
+```bash
+pnpm build
+```
+
+Build individual workspaces:
+
+```bash
+pnpm --filter @career/web run build      # Frontend only
+pnpm --filter @career/api run build      # Backend only
+```
+
+### Continuous Integration
+
+The repository uses GitHub Actions for automated validation. The workflow (`.github/workflows/ci.yml`) runs on:
+
+- Pull requests targeting `main`
+- Pushes to `main`
+
+The CI pipeline validates:
+
+1. Code formatting (Prettier)
+2. Code style (ESLint)
+3. Type safety (TypeScript)
+4. Unit and integration tests
+5. Production builds
+
+All checks must pass before merge. The workflow uses:
+
+- Node.js LTS (currently 22)
+- pnpm (currently 12.16.1)
+- Cached dependency installation for speed
+- Minimal GitHub Actions permissions for security
+
+### Development prerequisites
+
+- Node.js 22 (managed via `.nvmrc`)
+- pnpm 12.16.1 (managed via `packageManager` in `package.json`)
+- Docker and Docker Compose (for PostgreSQL with pgvector)
+
+Enable Corepack to use the correct pnpm version automatically:
+
+```bash
+corepack enable
+pnpm install
 ```
 
 Build for production:
@@ -165,17 +289,20 @@ pnpm --filter @career/api start
 The application exposes two health check endpoints:
 
 **`GET /health`** — Application liveness
+
 - Returns HTTP 200 with `{ "status": "ok" }` when the application is running
 - Does not depend on database availability
 - Use this for container orchestration liveness probes
 
 **`GET /ready`** — Application readiness
+
 - Returns HTTP 200 with pgvector version when the database is available and pgvector is active
 - Returns HTTP 503 when the database is unavailable or pgvector is not available
 - Use this for container orchestration readiness probes
 - Useful for orchestration, load balancers and startup sequencing
 
 Example readiness response when ready:
+
 ```json
 {
   "status": "ready",
@@ -184,6 +311,7 @@ Example readiness response when ready:
 ```
 
 Example readiness response when unavailable:
+
 ```json
 {
   "status": "unavailable",
@@ -196,15 +324,18 @@ Example readiness response when unavailable:
 The backend connects to PostgreSQL using `pg` with connection pooling.
 
 **Connection pooling** is configured via environment variables:
+
 - `DATABASE_URL`: PostgreSQL connection string (required)
 - `DATABASE_POOL_SIZE`: Connection pool size, 1-100 (default: 10)
 
 The database connection is:
+
 - Initialized when the app starts
 - Gracefully closed when the app shuts down
 - Verified through the `/ready` endpoint
 
 **Migrations** are managed through `pnpm db:migrate`, which:
+
 - Creates a `migrations` table if it doesn't exist
 - Tracks applied migrations by name
 - Runs repeatable migrations (e.g., extensions) on each execution
@@ -255,14 +386,15 @@ pnpm --filter @career/api test
 ```
 
 Tests include:
+
 - **Unit tests**: Environment configuration, error handling, HTTP responses
 - **Integration tests**: Real PostgreSQL connection, pgvector availability, connection pooling
 - **Skipped tests**: Database integration tests are automatically skipped if the database is unavailable
 
 To run database integration tests:
+
 ```bash
 pnpm db:up          # Start the database
 pnpm db:migrate     # Run migrations
 pnpm --filter @career/api test  # Run tests (database tests will run)
 ```
-

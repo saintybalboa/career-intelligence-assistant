@@ -55,4 +55,3 @@ export async function registerReadyRoute(app: FastifyInstance): Promise<void> {
     }
   });
 }
-

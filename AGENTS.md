@@ -22,20 +22,20 @@ This project is being developed as a take-home engineering assessment. Prioritis
 
 The intended architecture consists of:
 
-| Layer | Technology |
-|---|---|
-| Frontend | React, TypeScript, Vite |
-| Styling | Tailwind CSS |
-| Backend | Node.js, TypeScript, Fastify |
-| Validation | Zod |
-| Database | PostgreSQL with pgvector |
-| Package manager | pnpm workspaces |
-| Unit and integration testing | Vitest |
-| React component testing | React Testing Library |
-| End-to-end testing | Playwright |
-| Local infrastructure | Docker Compose |
-| AI integration | Provider API via the backend |
-| Logging | Structured logging with Pino |
+| Layer                        | Technology                   |
+| ---------------------------- | ---------------------------- |
+| Frontend                     | React, TypeScript, Vite      |
+| Styling                      | Tailwind CSS                 |
+| Backend                      | Node.js, TypeScript, Fastify |
+| Validation                   | Zod                          |
+| Database                     | PostgreSQL with pgvector     |
+| Package manager              | pnpm workspaces              |
+| Unit and integration testing | Vitest                       |
+| React component testing      | React Testing Library        |
+| End-to-end testing           | Playwright                   |
+| Local infrastructure         | Docker Compose               |
+| AI integration               | Provider API via the backend |
+| Logging                      | Structured logging with Pino |
 
 The stack represents the intended architecture. Do not install or implement technologies before the relevant GitHub issue requires them.
 

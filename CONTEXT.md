@@ -23,19 +23,19 @@ Document upload, indexing and response generation can have explicit pending, suc
 
 ## Ubiquitous language
 
-| Term | Meaning |
-|---|---|
-| **Candidate** | The person using the product to understand potential roles. |
-| **CV** | A supplied account of skills, qualifications and experience; not necessarily exhaustive. |
-| **Job description** | A supplied role description, including responsibilities, essential and desirable requirements where stated. |
-| **Document** | A supplied source with identity, type and processing state. Initially CV or job description. |
-| **Document chunk** | A traceable segment of extracted document text used for retrieval. |
-| **Embedding** | A numerical representation used for semantic retrieval, not evidence of role suitability itself. |
-| **Retrieval** | Selection of relevant document content for a particular question. |
-| **Conversation** | The questions and assistant answers within a session or thread. |
-| **Career analysis** | An evidence-based interpretation of alignment between supplied experience and job requirements. |
-| **Potential skill gap** | A requirement for which sufficient evidence has not been found in the supplied CV; not proof the skill is absent. |
-| **Source reference** | A traceable pointer from an answer to supporting document content, ideally including page or section where available. |
+| Term                    | Meaning                                                                                                               |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Candidate**           | The person using the product to understand potential roles.                                                           |
+| **CV**                  | A supplied account of skills, qualifications and experience; not necessarily exhaustive.                              |
+| **Job description**     | A supplied role description, including responsibilities, essential and desirable requirements where stated.           |
+| **Document**            | A supplied source with identity, type and processing state. Initially CV or job description.                          |
+| **Document chunk**      | A traceable segment of extracted document text used for retrieval.                                                    |
+| **Embedding**           | A numerical representation used for semantic retrieval, not evidence of role suitability itself.                      |
+| **Retrieval**           | Selection of relevant document content for a particular question.                                                     |
+| **Conversation**        | The questions and assistant answers within a session or thread.                                                       |
+| **Career analysis**     | An evidence-based interpretation of alignment between supplied experience and job requirements.                       |
+| **Potential skill gap** | A requirement for which sufficient evidence has not been found in the supplied CV; not proof the skill is absent.     |
+| **Source reference**    | A traceable pointer from an answer to supporting document content, ideally including page or section where available. |
 
 Do not use “candidate rating”, “hiring recommendation” or “match percentage” as interchangeable labels for career analysis. Any quantitative scoring needs a separate, justified product decision.
 

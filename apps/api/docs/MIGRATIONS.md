@@ -67,11 +67,11 @@ $$ LANGUAGE SQL;
 
 ## Available Commands
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm db:generate` | Generate new migrations from schema changes (must run before migrations are applied) |
-| `pnpm db:push` | Push schema changes directly to the database without creating migration files (use for development only) |
-| `pnpm db:migrate` | Apply all pending migrations to the database |
+| Command            | Purpose                                                                                                  |
+| ------------------ | -------------------------------------------------------------------------------------------------------- |
+| `pnpm db:generate` | Generate new migrations from schema changes (must run before migrations are applied)                     |
+| `pnpm db:push`     | Push schema changes directly to the database without creating migration files (use for development only) |
+| `pnpm db:migrate`  | Apply all pending migrations to the database                                                             |
 
 ## Files and Structure
 
@@ -84,6 +84,7 @@ $$ LANGUAGE SQL;
 ## Migration Naming
 
 Migrations are numbered sequentially:
+
 - `0000_enable_pgvector.sql` — Enable pgvector extension (manual, prerequisite for semantic search)
 - `0001_create_migrations_table.sql` — Create migrations tracking table (auto-generated from schema)
 - `0002_*.sql` — Additional migrations (numbered sequentially)
@@ -99,13 +100,16 @@ Migrations are numbered sequentially:
 ## Troubleshooting
 
 **Migration fails with "column does not exist"**
+
 - Ensure migrations run in order. Check `src/db/migrations/meta/_journal.json` for correct sequencing.
 - Verify the schema definition matches the migration intent.
 
 **`pnpm db:generate` produces no changes**
+
 - This is expected if there are no schema differences. No action needed.
 
 **Database connection fails during migration**
+
 - Ensure the database is running: `pnpm db:up`
 - Check the `DATABASE_URL` environment variable is correct
 - Verify the database is healthy: `pnpm db:up` waits for readiness before returning

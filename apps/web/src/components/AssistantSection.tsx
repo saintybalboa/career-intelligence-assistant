@@ -22,9 +22,8 @@ export function AssistantSection() {
             Assistant ready to help
           </p>
           <p className="mt-2 max-w-sm text-center text-sm text-secondary-600">
-            Once you upload your CV and job descriptions, you'll be able to ask
-            questions about role suitability, relevant experience, skill gaps,
-            and interview preparation.
+            Once you upload your CV and job descriptions, you'll be able to ask questions about role
+            suitability, relevant experience, skill gaps, and interview preparation.
           </p>
         </div>
       </div>

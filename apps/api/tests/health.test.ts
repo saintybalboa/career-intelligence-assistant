@@ -141,4 +141,3 @@ describe('environment configuration', () => {
     expect(() => loadConfig({ PORT: 'not-a-port' })).toThrowError(/PORT/);
   });
 });
-

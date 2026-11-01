@@ -34,6 +34,7 @@ If the concept you need isn't in the context yet, that's a signal: either you're
 If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
 
 > _Contradicts ADR-0007 (event-sourced orders), but worth reopening because…_
+
 # Domain Documentation
 
 ## Purpose

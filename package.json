@@ -1,15 +1,32 @@
 {
   "name": "career-intelligence-assistant",
+  "type": "module",
   "private": true,
   "packageManager": "pnpm@12.16.1",
   "engines": {
     "node": ">=22.0.0 <23.0.0"
   },
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm --filter './apps/*' --filter './packages/*' run typecheck",
+    "test": "pnpm --filter './apps/*' run test --run",
+    "build": "pnpm --filter './apps/*' run build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "db:migrate": "pnpm --filter @career/api db:migrate",
     "db:reset": "docker compose down -v"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3.9.10",
+    "typescript-eslint": "^8.72.1"
   }
 }
-

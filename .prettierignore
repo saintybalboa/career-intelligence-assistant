@@ -1,0 +1,54 @@
+# Prettier ignore patterns
+
+# Build outputs
+dist/
+build/
+out/
+.output/
+**/.next
+.nuxt
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Test and coverage
+coverage/
+.nyc_output/
+
+# Temporary and cache
+.cache/
+.parcel-cache/
+.turbo/
+.vitepress/dist/
+**/.vitepress/cache
+
+# Environment and local files
+.env
+.env.*
+!.env.example
+
+# Compiled files
+*.js.map
+*.ts.map
+*.tsbuildinfo
+
+# CI/CD and git
+.github/workflows/*.yml
+.git/
+
+# Version control and workspace
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker
+docker-compose.override.yml
+
+# Generated files and artifacts
+*.generated.ts
+*.generated.tsx
+.eslintcache
