@@ -3,7 +3,7 @@ services:
     image: pgvector/pgvector:0.8.7-pg17
     environment:
       POSTGRES_USER: career
-      POSTGRES_PASSWORD: career_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-career_password}
       POSTGRES_DB: career_ai
     ports:
       - '5432:5432'
