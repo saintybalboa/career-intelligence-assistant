@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
 import { ConfigurationError, loadConfig } from '../src/config/env.js';
+import { loadDatabaseConfig } from '../src/config/database.js';
+import { closeDatabase } from '../src/db/index.js';
 
 describe('API HTTP behavior', () => {
   const apps: ReturnType<typeof createApp>[] = [];
@@ -8,18 +10,23 @@ describe('API HTTP behavior', () => {
   afterEach(async () => {
     await Promise.all(apps.map((app) => app.close()));
     apps.length = 0;
+    await closeDatabase();
   });
 
   function createTestApp() {
-    const app = createApp(
-      loadConfig({
+    const app = createApp({
+      config: loadConfig({
         NODE_ENV: 'test',
         HOST: '127.0.0.1',
         PORT: '3001',
         CORS_ORIGIN: 'http://localhost:5173',
         LOG_LEVEL: 'silent',
       }),
-    );
+      databaseConfig: loadDatabaseConfig({
+        DATABASE_URL: 'postgresql://career:career_password@127.0.0.1:5432/career_ai',
+        DATABASE_POOL_SIZE: '5',
+      }),
+    });
     apps.push(app);
     return app;
   }
@@ -134,3 +141,4 @@ describe('environment configuration', () => {
     expect(() => loadConfig({ PORT: 'not-a-port' })).toThrowError(/PORT/);
   });
 });
+

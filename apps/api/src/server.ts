@@ -1,10 +1,12 @@
 import { pathToFileURL } from 'node:url';
 import { createApp } from './app.js';
 import { loadConfig } from './config/env.js';
+import { loadDatabaseConfig } from './config/database.js';
 
 export async function startServer(): Promise<void> {
   const config = loadConfig();
-  const app = createApp(config);
+  const databaseConfig = loadDatabaseConfig();
+  const app = createApp({ config, databaseConfig });
 
   const shutdown = async (signal: string): Promise<void> => {
     app.log.info({ signal }, 'Shutting down server');

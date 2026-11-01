@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:pg17-v0.7.4
+    environment:
+      POSTGRES_USER: career
+      POSTGRES_PASSWORD: career_password
+      POSTGRES_DB: career_ai
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U career -d career_ai']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
