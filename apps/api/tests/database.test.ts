@@ -9,7 +9,7 @@ import { closeDatabase, getDatabase } from '../src/db/index.js';
  * Integration tests for database readiness endpoint.
  * These tests require a running PostgreSQL database with pgvector extension.
  * They test against the real database, not mocked connections.
- * 
+ *
  * To run these tests with a real database:
  * 1. pnpm db:up
  * 2. pnpm db:migrate
@@ -27,14 +27,14 @@ describe('Database readiness endpoint (/ready)', () => {
   beforeAll(async () => {
     // Create a test pool to manage the database
     testPool = new Pool({ connectionString: dbConfig.url });
-    
+
     try {
       // Try to connect and verify database is available
       const testClient = await testPool.connect();
       try {
         await testClient.query('SELECT 1');
         databaseAvailable = true;
-        
+
         // Ensure pgvector extension exists
         await testClient.query('CREATE EXTENSION IF NOT EXISTS vector;');
         await testClient.query(`
@@ -59,11 +59,7 @@ describe('Database readiness endpoint (/ready)', () => {
 
   it(
     'returns 200 with pgvector version when database is available and healthy',
-    async (context) => {
-      if (!databaseAvailable) {
-        context.skip();
-      }
-
+    async () => {
       const app = createApp({
         config: loadConfig({
           NODE_ENV: 'test',
@@ -95,11 +91,7 @@ describe('Database readiness endpoint (/ready)', () => {
 
   it(
     'returns 503 when database connection cannot be established',
-    async (context) => {
-      if (!databaseAvailable) {
-        context.skip();
-      }
-
+    async () => {
       const app = createApp({
         config: loadConfig({
           NODE_ENV: 'test',
@@ -162,11 +154,7 @@ describe('Database readiness endpoint (/ready)', () => {
 
   it(
     'closes database connections gracefully on app shutdown',
-    async (context) => {
-      if (!databaseAvailable) {
-        context.skip();
-      }
-
+    async () => {
       const app = createApp({
         config: loadConfig({
           NODE_ENV: 'test',
