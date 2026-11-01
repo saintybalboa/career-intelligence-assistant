@@ -14,7 +14,7 @@
     "typecheck": "pnpm --filter './apps/*' --filter './packages/*' run typecheck",
     "test": "pnpm --filter './apps/*' run test",
     "build": "pnpm --filter './apps/*' run build",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test --run",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "db:migrate": "pnpm --filter @career/api db:migrate",
