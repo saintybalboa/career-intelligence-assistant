@@ -1,4 +1,7 @@
+import { eq, desc } from 'drizzle-orm';
 import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { documentsTable } from '../db/schema.js';
 import { Document, DocumentType, ProcessingState } from '../domain/document.js';
 
 export interface DocumentRepository {
@@ -16,7 +19,11 @@ export interface DocumentRepository {
 }
 
 export class PostgresDocumentRepository implements DocumentRepository {
-  constructor(private pool: Pool) {}
+  private db: ReturnType<typeof drizzle>;
+
+  constructor(private pool: Pool) {
+    this.db = drizzle(pool);
+  }
 
   async create(data: {
     type: DocumentType;
@@ -25,103 +32,83 @@ export class PostgresDocumentRepository implements DocumentRepository {
     fileSizeBytes: number;
     mimeType: string;
   }): Promise<Document> {
-    const query = `
-      INSERT INTO documents (type, original_file_name, storage_path, file_size_bytes, mime_type, processing_state)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id, type, original_file_name, storage_path, file_size_bytes, mime_type, processing_state, created_at, updated_at
-    `;
+    const result = await this.db
+      .insert(documentsTable)
+      .values({
+        type: data.type,
+        originalFileName: data.originalFileName,
+        storagePath: data.storagePath,
+        fileSizeBytes: data.fileSizeBytes,
+        mimeType: data.mimeType,
+        processingState: 'pending' as const,
+      })
+      .returning();
 
-    const result = await this.pool.query(query, [
-      data.type,
-      data.originalFileName,
-      data.storagePath,
-      data.fileSizeBytes,
-      data.mimeType,
-      'pending',
-    ]);
-
-    const row = result.rows[0];
-    return this.mapRow(row);
+    return this.mapRow(result[0]);
   }
 
   async findById(id: string): Promise<Document | null> {
-    const query = `
-      SELECT id, type, original_file_name, storage_path, file_size_bytes, mime_type, processing_state, created_at, updated_at
-      FROM documents
-      WHERE id = $1
-    `;
+    const results = await this.db.select().from(documentsTable).where(eq(documentsTable.id, id));
 
-    const result = await this.pool.query(query, [id]);
-    if (result.rows.length === 0) {
+    if (results.length === 0) {
       return null;
     }
 
-    return this.mapRow(result.rows[0]);
+    return this.mapRow(results[0]);
   }
 
   async findAll(): Promise<Document[]> {
-    const query = `
-      SELECT id, type, original_file_name, storage_path, file_size_bytes, mime_type, processing_state, created_at, updated_at
-      FROM documents
-      ORDER BY created_at DESC
-    `;
+    const results = await this.db
+      .select()
+      .from(documentsTable)
+      .orderBy(desc(documentsTable.createdAt));
 
-    const result = await this.pool.query(query);
-    return result.rows.map((row) => this.mapRow(row));
+    return results.map((row) => this.mapRow(row));
   }
 
   async update(
     id: string,
     data: Partial<{ processingState: ProcessingState }>
   ): Promise<Document | null> {
-    const updates: string[] = [];
-    const values: unknown[] = [];
-    let paramCount = 1;
+    const updateData: Record<string, unknown> = {};
 
     if (data.processingState !== undefined) {
-      updates.push(`processing_state = $${paramCount++}`);
-      values.push(data.processingState);
+      updateData.processingState = data.processingState;
     }
 
-    if (updates.length === 0) {
+    if (Object.keys(updateData).length === 0) {
       return this.findById(id);
     }
 
-    updates.push(`updated_at = NOW()`);
-    values.push(id);
+    const results = await this.db
+      .update(documentsTable)
+      .set(updateData)
+      .where(eq(documentsTable.id, id))
+      .returning();
 
-    const query = `
-      UPDATE documents
-      SET ${updates.join(', ')}
-      WHERE id = $${paramCount}
-      RETURNING id, type, original_file_name, storage_path, file_size_bytes, mime_type, processing_state, created_at, updated_at
-    `;
-
-    const result = await this.pool.query(query, values);
-    if (result.rows.length === 0) {
+    if (results.length === 0) {
       return null;
     }
 
-    return this.mapRow(result.rows[0]);
+    return this.mapRow(results[0]);
   }
 
   async delete(id: string): Promise<boolean> {
-    const query = 'DELETE FROM documents WHERE id = $1';
-    const result = await this.pool.query(query, [id]);
+    const result = await this.db.delete(documentsTable).where(eq(documentsTable.id, id));
     return result.rowCount !== null && result.rowCount > 0;
   }
 
-  private mapRow(row: Record<string, unknown>): Document {
+  private mapRow(row: typeof documentsTable.$inferSelect): Document {
     return {
-      id: row.id as string,
+      id: row.id,
       type: row.type as DocumentType,
-      originalFileName: row.original_file_name as string,
-      storagePath: row.storage_path as string,
-      fileSizeBytes: row.file_size_bytes as number,
-      mimeType: row.mime_type as string,
-      processingState: row.processing_state as ProcessingState,
-      createdAt: new Date(row.created_at as string),
-      updatedAt: new Date(row.updated_at as string),
+      originalFileName: row.originalFileName,
+      storagePath: row.storagePath,
+      fileSizeBytes: row.fileSizeBytes,
+      mimeType: row.mimeType,
+      processingState: row.processingState as ProcessingState,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
     };
   }
 }

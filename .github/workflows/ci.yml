@@ -74,7 +74,7 @@ jobs:
           PGPASSWORD: test_password
 
       - name: Run database migrations
-        run: pnpm db:migrate
+        run: pnpm --filter @career/api db:migrate
         env:
           DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
 

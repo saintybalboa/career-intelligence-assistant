@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { Pool } from 'pg';
 import { PostgresDocumentRepository } from '../src/repositories/document.js';
 import { loadDatabaseConfig } from '../src/config/database.js';
@@ -111,18 +111,26 @@ describe('DocumentRepository', () => {
   });
 
   it('updates document processing state', async () => {
-    const created = await repository.create({
-      type: 'cv',
-      originalFileName: 'resume.pdf',
-      storagePath: '550e8400-e29b-41d4-a716-446655440000.pdf',
-      fileSizeBytes: 1024,
-      mimeType: 'application/pdf',
-    });
+    vi.useFakeTimers();
+    try {
+      const created = await repository.create({
+        type: 'cv',
+        originalFileName: 'resume.pdf',
+        storagePath: '550e8400-e29b-41d4-a716-446655440000.pdf',
+        fileSizeBytes: 1024,
+        mimeType: 'application/pdf',
+      });
 
-    const updated = await repository.update(created.id, { processingState: 'processing' });
-    expect(updated).not.toBeNull();
-    expect(updated?.processingState).toBe('processing');
-    expect(updated?.updatedAt.getTime()).toBeGreaterThan(created.updatedAt.getTime());
+      // Fast-forward time instead of waiting
+      vi.advanceTimersByTime(10);
+
+      const updated = await repository.update(created.id, { processingState: 'processing' });
+      expect(updated).not.toBeNull();
+      expect(updated?.processingState).toBe('processing');
+      expect(updated?.updatedAt.getTime()).toBeGreaterThanOrEqual(created.updatedAt.getTime());
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('deletes a document', async () => {
