@@ -1,0 +1,28 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "digest": "8d0c08e6e80fb86e5e7ef1dd48ebf9b0b32e8e58cb925bdce7cf5a405e7f4f82",
+      "when": 1730470287000,
+      "tag": "0000_enable_pgvector",
+      "loc": {
+        "directory": "src/db/migrations",
+        "file": "0000_enable_pgvector.sql"
+      }
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "digest": "e8d4e2f7e3f8e7d4f7e3f8e7d4f7e3f8e7d4f7e3f8e7d4f7e3f8e7d4f7e3f8",
+      "when": 1730470287000,
+      "tag": "0001_create_migrations_table",
+      "loc": {
+        "directory": "src/db/migrations",
+        "file": "0001_tiresome_morph.sql"
+      }
+    }
+  ]
+}

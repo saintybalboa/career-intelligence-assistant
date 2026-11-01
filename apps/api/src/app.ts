@@ -2,15 +2,29 @@ import cors from '@fastify/cors';
 import Fastify, { type FastifyInstance } from 'fastify';
 
 import { loadConfig, type AppConfig } from './config/env.js';
+import { loadDatabaseConfig, type DatabaseConfig } from './config/database.js';
+import { initializeDatabase, closeDatabase } from './db/index.js';
 import { registerHealthRoute } from './routes/health.js';
+import { registerReadyRoute } from './routes/ready.js';
 
-export function createApp(config: AppConfig = loadConfig()): FastifyInstance {
+export interface AppOptions {
+  config?: AppConfig;
+  databaseConfig?: DatabaseConfig;
+}
+
+export function createApp(options: AppOptions = {}): FastifyInstance {
+  const config = options.config ?? loadConfig();
+  const databaseConfig = options.databaseConfig ?? loadDatabaseConfig();
+
   const app = Fastify({
     logger: {
       level: config.logLevel,
     },
     requestIdHeader: 'x-request-id',
   });
+
+  // Initialize database
+  initializeDatabase(databaseConfig, app.log);
 
   void app.register(cors, {
     origin: (origin, callback) => {
@@ -19,6 +33,12 @@ export function createApp(config: AppConfig = loadConfig()): FastifyInstance {
   });
 
   void app.register(registerHealthRoute);
+  void app.register(registerReadyRoute);
+
+  // Graceful shutdown
+  app.addHook('onClose', async () => {
+    await closeDatabase();
+  });
 
   app.setNotFoundHandler((_request, reply) => {
     void reply.code(404).send({
