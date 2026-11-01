@@ -16,6 +16,22 @@ jobs:
     name: Lint, Type Check, Test, Build
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+          POSTGRES_INITDB_ARGS: "-c max_connections=200"
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,6 +64,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U test_user; do
+            echo 'Waiting for PostgreSQL...'
+            sleep 1
+          done
+        env:
+          PGPASSWORD: test_password
+
+      - name: Run database migrations
+        run: pnpm --filter @career/api db:migrate
+        env:
+          DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
+
       - name: Check formatting
         run: pnpm format:check
 
@@ -59,6 +89,8 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+        env:
+          DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
 
       - name: Build all applications
         run: pnpm build

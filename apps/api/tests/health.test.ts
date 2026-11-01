@@ -133,6 +133,8 @@ describe('environment configuration', () => {
       port: 3001,
       corsOrigin: 'http://localhost:5173',
       logLevel: 'info',
+      documentsStoragePath: './storage/documents',
+      maxUploadSizeMb: 50,
     });
   });
 

@@ -23,6 +23,13 @@
         "directory": "src/db/migrations",
         "file": "0001_tiresome_morph.sql"
       }
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793546397894,
+      "tag": "0002_cuddly_thaddeus_ross",
+      "breakpoints": true
     }
   ]
 }

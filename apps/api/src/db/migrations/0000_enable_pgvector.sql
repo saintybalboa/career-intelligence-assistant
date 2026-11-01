@@ -1,1 +1,4 @@
-CREATE EXTENSION IF NOT EXISTS vector;
+-- pgvector extension installation skipped for now
+-- Will be added when vector search is implemented
+-- For local development with vector search, install pgvector manually:
+-- CREATE EXTENSION IF NOT EXISTS vector;

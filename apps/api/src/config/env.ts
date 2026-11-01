@@ -6,6 +6,8 @@ const environmentSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65_535).default(3001),
   CORS_ORIGIN: z.string().url().default('http://localhost:5173'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  DOCUMENTS_STORAGE_PATH: z.string().default('./storage/documents'),
+  MAX_UPLOAD_SIZE_MB: z.coerce.number().int().min(1).max(500).default(50),
 });
 
 export type AppConfig = {
@@ -14,6 +16,8 @@ export type AppConfig = {
   port: number;
   corsOrigin: string;
   logLevel: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
+  documentsStoragePath: string;
+  maxUploadSizeMb: number;
 };
 
 export class ConfigurationError extends Error {
@@ -39,5 +43,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     port: result.data.PORT,
     corsOrigin: result.data.CORS_ORIGIN,
     logLevel: result.data.LOG_LEVEL,
+    documentsStoragePath: result.data.DOCUMENTS_STORAGE_PATH,
+    maxUploadSizeMb: result.data.MAX_UPLOAD_SIZE_MB,
   };
 }
