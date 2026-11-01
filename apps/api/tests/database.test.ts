@@ -57,9 +57,13 @@ describe('Database readiness endpoint (/ready)', () => {
     await testPool.end();
   });
 
-  (databaseAvailable ? it : it.skip)(
+  it(
     'returns 200 with pgvector version when database is available and healthy',
-    async () => {
+    async (context) => {
+      if (!databaseAvailable) {
+        context.skip();
+      }
+
       const app = createApp({
         config: loadConfig({
           NODE_ENV: 'test',
@@ -89,9 +93,13 @@ describe('Database readiness endpoint (/ready)', () => {
     }
   );
 
-  (databaseAvailable ? it : it.skip)(
+  it(
     'returns 503 when database connection cannot be established',
-    async () => {
+    async (context) => {
+      if (!databaseAvailable) {
+        context.skip();
+      }
+
       const app = createApp({
         config: loadConfig({
           NODE_ENV: 'test',
@@ -101,7 +109,7 @@ describe('Database readiness endpoint (/ready)', () => {
           LOG_LEVEL: 'silent',
         }),
         databaseConfig: {
-          url: 'postgresql://career:wrongpassword@127.0.0.1:5432/nonexistent',
+          url: 'postgresql://career:career_password@127.0.0.1:5432/nonexistent',
           poolSize: 5,
         },
       });
@@ -123,7 +131,7 @@ describe('Database readiness endpoint (/ready)', () => {
     }
   );
 
-  (databaseAvailable ? it : it.skip)(
+  it(
     'health endpoint remains functional independent of database availability',
     async () => {
       const app = createApp({
@@ -152,9 +160,13 @@ describe('Database readiness endpoint (/ready)', () => {
     }
   );
 
-  (databaseAvailable ? it : it.skip)(
+  it(
     'closes database connections gracefully on app shutdown',
-    async () => {
+    async (context) => {
+      if (!databaseAvailable) {
+        context.skip();
+      }
+
       const app = createApp({
         config: loadConfig({
           NODE_ENV: 'test',
