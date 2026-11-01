@@ -26,6 +26,9 @@ export class PostgresConnection implements DatabaseConnection {
       statement_timeout: 5_000,
     });
     this.logger = logger;
+    this.pool.on('error', (error: Error) => {
+      this.logger.error({ err: error }, 'Unexpected error on idle database client');
+    });
   }
 
   async isConnected(): Promise<boolean> {
