@@ -63,6 +63,53 @@ Preview production build:
 pnpm --filter @career/web preview
 ```
 
+## Backend development
+
+The backend is an independently runnable Fastify application in `apps/api`.
+It uses strict TypeScript checking, Zod-validated environment configuration and
+Fastify's built-in Pino logging.
+
+Install workspace dependencies from the repository root:
+
+```bash
+corepack enable
+pnpm install
+```
+
+Use the example environment file as a reference when setting environment
+variables in your shell:
+
+```bash
+export NODE_ENV=development
+export HOST=127.0.0.1
+export PORT=3001
+export CORS_ORIGIN=http://localhost:5173
+export LOG_LEVEL=info
+```
+
+The available settings are `NODE_ENV`, `HOST`, `PORT`, `CORS_ORIGIN` and
+`LOG_LEVEL`. Defaults are suitable for local development and all values are documented in
+[`apps/api/.env.example`](apps/api/.env.example).
+
+Run the backend in development mode with automatic restarting:
+
+```bash
+pnpm --filter @career/api dev
+```
+
+Run backend tests and build the production application:
+
+```bash
+pnpm --filter @career/api test
+pnpm --filter @career/api build
+pnpm --filter @career/api start
+```
+
+The liveness endpoint is available at `GET http://127.0.0.1:3001/health` and
+returns `{ "status": "ok" }`. The application factory is separate from server
+startup so routes can be tested with Fastify's `inject()` without opening a
+network listener.
+
 ### Configuration
 
 The frontend uses the following configuration:
