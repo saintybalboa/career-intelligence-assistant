@@ -21,6 +21,9 @@ export class PostgresConnection implements DatabaseConnection {
     this.pool = new Pool({
       connectionString,
       max: poolSize,
+      connectionTimeoutMillis: 5_000,
+      query_timeout: 5_000,
+      statement_timeout: 5_000,
     });
     this.logger = logger;
   }
