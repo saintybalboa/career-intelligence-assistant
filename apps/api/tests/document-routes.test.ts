@@ -84,18 +84,31 @@ describe('Document API endpoints', () => {
       const response = await app.inject({
         method: 'POST',
         url: '/documents/upload',
-        payload: {
-          type: 'cv',
-          file: pdfBuffer,
-        },
+        payload: Buffer.concat([
+          Buffer.from(
+            '------WebKitFormBoundary\r\n' +
+              'Content-Disposition: form-data; name="type"\r\n\r\ncv\r\n' +
+              '------WebKitFormBoundary\r\n' +
+              'Content-Disposition: form-data; name="file"; filename="test.pdf"\r\n' +
+              'Content-Type: application/pdf\r\n\r\n'
+          ),
+          pdfBuffer,
+          Buffer.from('\r\n------WebKitFormBoundary--\r\n'),
+        ]),
         headers: {
           'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary',
         },
       });
 
-      // Note: Due to multipart complexities, this test uses simplified injection
-      // In production, use proper multipart clients like FormData or axios
-      expect(response.statusCode).toBeDefined();
+      expect(response.statusCode).toBe(201);
+      expect(response.json()).toMatchObject({
+        type: 'cv',
+        originalFileName: 'test.pdf',
+        fileSizeBytes: pdfBuffer.length,
+      });
+      const storedFiles = await fs.readdir(testStoragePath);
+      expect(storedFiles).toHaveLength(1);
+      expect(await fs.readFile(path.join(testStoragePath, storedFiles[0]))).toEqual(pdfBuffer);
     } finally {
       await app.close();
       await closeDatabase();
