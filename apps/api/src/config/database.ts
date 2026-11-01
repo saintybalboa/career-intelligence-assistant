@@ -1,7 +1,13 @@
 import { z } from 'zod';
 
 const databaseConfigSchema = z.object({
-  DATABASE_URL: z.string().min(1).default('postgresql://career:career_password@127.0.0.1:5432/career_ai'),
+  DATABASE_URL: z
+    .string()
+    .url()
+    .refine((value) => /^postgres(?:ql)?:\/\//.test(value), {
+      message: 'Must be a PostgreSQL connection URL',
+    })
+    .default('postgresql://career:career_password@127.0.0.1:5432/career_ai'),
   DATABASE_POOL_SIZE: z.coerce.number().int().min(1).max(100).default(10),
 });
 
