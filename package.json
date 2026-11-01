@@ -6,10 +6,10 @@
     "node": ">=22.0.0 <23.0.0"
   },
   "scripts": {
-    "db:up": "docker compose up -d",
-    "db:down": "docker compose down",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
     "db:migrate": "pnpm --filter @career/api db:migrate",
-    "db:reset": "docker compose down -v"
+    "db:reset": "docker-compose down -v"
   }
 }
 
