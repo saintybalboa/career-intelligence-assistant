@@ -1,11 +1,15 @@
 import cors from '@fastify/cors';
 import Fastify, { type FastifyInstance } from 'fastify';
+import { Pool } from 'pg';
 
 import { loadConfig, type AppConfig } from './config/env.js';
 import { loadDatabaseConfig, type DatabaseConfig } from './config/database.js';
-import { initializeDatabase, closeDatabase } from './db/index.js';
+import { initializeDatabase, closeDatabase, getDatabase } from './db/index.js';
 import { registerHealthRoute } from './routes/health.js';
 import { registerReadyRoute } from './routes/ready.js';
+import { registerDocumentRoutes } from './routes/documents.js';
+import { PostgresDocumentRepository } from './repositories/document.js';
+import { LocalFileStorageService } from './services/file-storage.js';
 
 export interface AppOptions {
   config?: AppConfig;
@@ -34,6 +38,31 @@ export function createApp(options: AppOptions = {}): FastifyInstance {
 
   void app.register(registerHealthRoute);
   void app.register(registerReadyRoute);
+
+  // Initialize document routes with proper async handling
+  void app.register(async (fastify) => {
+    const db = getDatabase();
+    if (db) {
+      const pool = new Pool({ connectionString: databaseConfig.url });
+      const documentRepository = new PostgresDocumentRepository(pool);
+      const fileStorageService = new LocalFileStorageService({
+        basePath: config.documentsStoragePath,
+        maxSizeBytes: config.maxUploadSizeMb * 1024 * 1024,
+      });
+
+      try {
+        await fileStorageService.ensureStorageDirectory();
+      } catch (error) {
+        fastify.log.error({ err: error }, 'Failed to ensure storage directory');
+      }
+
+      await registerDocumentRoutes(fastify, {
+        documentRepository,
+        fileStorageService,
+        maxUploadSizeMb: config.maxUploadSizeMb,
+      });
+    }
+  });
 
   // Graceful shutdown
   app.addHook('onClose', async () => {
