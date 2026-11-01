@@ -122,11 +122,17 @@ describe('Document API endpoints', () => {
       const response = await app.inject({
         method: 'POST',
         url: '/documents/upload',
-        payload: {},
+        payload:
+          '------WebKitFormBoundary\r\n' +
+          'Content-Disposition: form-data; name="type"\r\n\r\ncv\r\n' +
+          '------WebKitFormBoundary--\r\n',
+        headers: {
+          'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary',
+        },
       });
 
-      // Request should not error - multipart will handle it
-      expect(response.statusCode).toBeDefined();
+      expect(response.statusCode).toBe(400);
+      expect(response.json()).toMatchObject({ error: { code: 'MISSING_FILE' } });
     } finally {
       await app.close();
       await closeDatabase();
