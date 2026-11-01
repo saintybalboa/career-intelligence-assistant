@@ -37,13 +37,6 @@ describe('Database readiness endpoint (/ready)', () => {
 
         // Ensure pgvector extension exists
         await testClient.query('CREATE EXTENSION IF NOT EXISTS vector;');
-        await testClient.query(`
-          CREATE TABLE IF NOT EXISTS migrations (
-            id SERIAL PRIMARY KEY,
-            name TEXT UNIQUE NOT NULL,
-            executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          );
-        `);
       } finally {
         testClient.release();
       }
