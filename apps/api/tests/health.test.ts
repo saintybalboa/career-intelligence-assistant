@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from 'vitest';
-
 import { createApp } from '../src/app.js';
 import { ConfigurationError, loadConfig } from '../src/config/env.js';
 
